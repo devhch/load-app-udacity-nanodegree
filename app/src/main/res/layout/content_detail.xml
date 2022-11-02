@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.motion.widget.MotionLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutDescription="@xml/detail_motion_scene"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:context=".DetailActivity"
+        tools:showIn="@layout/activity_detail">
+
+        <TextView
+            android:id="@+id/file_name_title"
+            style="@style/TitleTextStyle"
+            android:layout_marginStart="@dimen/space20"
+            android:layout_marginTop="@dimen/space32"
+            android:text="@string/file_name_title"
+            android:textSize="@dimen/text_size_20"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/file_name"
+            style="@style/TitleTextStyle"
+            android:layout_width="0dp"
+            android:layout_marginStart="@dimen/space40"
+            android:layout_marginTop="@dimen/space32"
+            android:layout_marginEnd="@dimen/space16"
+            android:text="@string/file_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/file_name_title"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/status_title_text_view"
+            style="@style/TitleTextStyle"
+            android:layout_marginStart="@dimen/space20"
+            android:layout_marginTop="@dimen/space32"
+            android:text="@string/status_title"
+            android:textSize="@dimen/text_size_20"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/file_name" />
+
+        <TextView
+            android:id="@+id/status_text_view"
+            style="@style/TitleTextStyle"
+            android:layout_width="0dp"
+            android:layout_marginStart="@dimen/space40"
+            android:layout_marginTop="@dimen/space32"
+            android:layout_marginEnd="@dimen/space16"
+            android:text="@string/status"
+            app:layout_constraintTop_toBottomOf="@id/file_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/status_title_text_view"
+ />
+
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/ok_button"
+            style="@style/TitleTextStyle"
+            android:layout_width="0dp"
+            android:layout_marginHorizontal="@dimen/space20"
+            android:layout_marginBottom="@dimen/space16"
+            android:background="@color/colorAccent"
+            android:text="@string/ok"
+            android:textAlignment="center"
+            android:textColor="@color/cardview_light_background"
+            android:textSize="@dimen/text_size_26"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.motion.widget.MotionLayout>
+</layout>

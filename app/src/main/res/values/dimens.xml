@@ -1,0 +1,21 @@
+<resources>
+    <dimen name="default_text_size">20sp</dimen>
+
+    <dimen name="space8">8dp</dimen>
+    <dimen name="space10">10dp</dimen>
+    <dimen name="space16">16dp</dimen>
+    <dimen name="space20">20dp</dimen>
+    <dimen name="space28">28dp</dimen>
+    <dimen name="space32">32dp</dimen>
+    <dimen name="space40">40dp</dimen>
+    <dimen name="space100">100dp</dimen>
+
+    <dimen name="download_button_height">60dp</dimen>
+
+    <dimen name="text_size_12">12sp</dimen>
+    <dimen name="text_size_16">16sp</dimen>
+    <dimen name="text_size_20">20sp</dimen>
+    <dimen name="text_size_26">26sp</dimen>
+    <dimen name="text_size_30">30sp</dimen>
+    <dimen name="text_size_40">40sp</dimen>
+</resources>
