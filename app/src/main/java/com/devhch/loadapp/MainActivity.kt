@@ -30,8 +30,6 @@ class MainActivity : AppCompatActivity() {
     private var downloadID: Long = 0
 
     private lateinit var notificationManager: NotificationManager
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var action: NotificationCompat.Action
 
     // Set Values to these variable when the user checked a RadioButton
     private var checkedGitHubRepository: String? = null

@@ -14,6 +14,14 @@ A notification will be sent once the download is complete. When a user clicks on
 
 Instructions for how to get a copy of the project running on your local machine.
 
+
+### Screenshots
+
+![Screenshot 1](screenshots/loadapp1.png)
+![Screenshot 1](screenshots/loadapp2.png)
+![Screenshot 1](screenshots/loadapp3.png)
+![Screenshot 1](screenshots/loadapp4.png)
+
 ### Dependencies
 
 ```
