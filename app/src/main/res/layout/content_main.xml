@@ -55,6 +55,8 @@
         <com.devhch.loadapp.LoadingButton
             android:id="@+id/download_button"
             style="@style/TitleTextStyle"
+            app:text="@string/download"
+            app:buttonBackgroundColor="@color/colorPrimary"
             android:layout_width="0dp"
             android:layout_height="@dimen/download_button_height"
             android:layout_margin="@dimen/space20"

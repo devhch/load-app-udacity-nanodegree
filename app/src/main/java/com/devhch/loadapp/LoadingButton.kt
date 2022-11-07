@@ -11,196 +11,285 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.content.withStyledAttributes
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
-    private var widthSize = 0
-    private var heightSize = 0
 
+    // ValueAnimator
     private var valueAnimator = ValueAnimator()
 
-    private var buttonText: String
-    private var buttonBackgroundColor = R.attr.buttonBackgroundColor
-    private var progress: Float = 0f
-    private val textRect = Rect()
+    // Button Text
+    private var buttonText: String = "Null"
 
+    // Button Background Color
+    private var buttonBackgroundColor = 0
+
+    // Progress
+    private var progress: Float = 0f
+
+    // Button State
     private var buttonState: ButtonState by Delegates.observable(ButtonState.Completed) { _, _, new ->
         when (new) {
             ButtonState.Loading -> {
+                // Set Button Text to We are loading
                 setText(context.getString(R.string.button_loading))
-                setBackgroundColorFromRes(R.color.colorPrimaryDark)
-                valueAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
+
+                //  Changes Background Paint Color to colorPrimary when the button state is Loading
+                backgroundPaint.color = ContextCompat.getColor(context, R.color.colorPrimary)
+
+                // Change buttonBackgroundColor and Re Draw
+                setBackgroundColorFromRecourse(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.colorPrimaryDark
+                    )
+                )
+
+                // Start Animation...
+                valueAnimator = ValueAnimator.ofFloat(0F, 1F).apply {
                     addUpdateListener {
                         progress = animatedValue as Float
+
+                        // Forcing a call to onDraw() to redraw the view.
                         invalidate()
                     }
                     repeatMode = ValueAnimator.REVERSE
                     repeatCount = ValueAnimator.INFINITE
-                    duration = 3000
+                    duration = 2000
+
+                    // Call disableViewDuringAnimation() Method,
+                    // and set enabled to false when the animation is started
                     disableViewDuringAnimation()
+
+                    // Start Animation
                     start()
                 }
-                disableLoadingButton()
+
+                // Set enabled to false, To avoid pressing the button while downloading
+                isEnabled = false
             }
 
             ButtonState.Completed -> {
+                // Set Progress to 0
+                progress = 0F
+
+                // Set Button Text to Download
                 setText(context.getString(R.string.download))
-                setBackgroundColorFromRes(R.color.colorPrimary)
+
+                //  Changes Background Paint Color to colorPrimary when the button state is Completed
+                backgroundPaint.color = ContextCompat.getColor(context, R.color.colorPrimary)
+
+                // Set enabled to true, So the user can click again
+                // On the button when state is Completed
+                isEnabled = true
+
+                // Change buttonBackgroundColor and Re Draw
+                setBackgroundColorFromRecourse(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.colorPrimary
+                    )
+                )
+
+                // Cancel ValueAnimator
                 valueAnimator.cancel()
-                resetProgress()
-                enableLoadingButton()
             }
 
             ButtonState.Clicked -> {
+                // Set Button Text to Clicked
                 setText(context.getString(R.string.button_clicked))
-                setBackgroundColorFromRes(R.color.colorAccent)
+
+                // Changes Background Paint Color to colorAccent when the button state is clicked
+                backgroundPaint.color = ContextCompat.getColor(context, R.color.colorAccent)
+
+                // Change buttonBackgroundColor and Re Draw
+                setBackgroundColorFromRecourse(ContextCompat.getColor(context, R.color.colorAccent))
             }
         }
-        invalidate()
+        reDraw()
     }
-
 
     init {
-        context.theme.obtainStyledAttributes(
+        context.withStyledAttributes(
             attrs,
-            R.styleable.LoadingButton,
-            0, 0
-        ).apply {
-            try {
-                buttonText = getString(R.styleable.LoadingButton_text).toString()
-                buttonBackgroundColor = ContextCompat.getColor(context, R.color.colorPrimary)
-            } finally {
-                recycle()
-            }
+            R.styleable.LoadingButton
+        ) {
+            // Get LoadingButton_text String
+            getString(R.styleable.LoadingButton_text)?.let { buttonText = it }
+            buttonBackgroundColor = getColor(R.styleable.LoadingButton_buttonBackgroundColor, 0)
+
         }
     }
 
-    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-        textAlign = Paint.Align.CENTER
-        textSize = 40.0F
-        color = Color.WHITE
-    }
-
+    // Background Paint
     private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = ContextCompat.getColor(context, R.color.colorPrimary)
     }
 
+    // In Progress Background Paint
     private val inProgressBackgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = ContextCompat.getColor(context, R.color.colorPrimaryDark)
     }
 
+    // In Progress Arc Paint
     private val inProgressArcPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = ContextCompat.getColor(context, R.color.colorAccent)
     }
 
+    // Text Paint
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        // Set Style to FILL
+        style = Paint.Style.FILL
+
+        // Set Text Alignment to Center
+        textAlign = Paint.Align.CENTER
+
+        // Set Text Size to 60
+        textSize = 60.0F
+
+        // Set Font
+        typeface = ResourcesCompat.getFont(context, R.font.univia_pro_regular)
+
+        // Set Text Color to WHITE
+        color = Color.WHITE
+    }
+
+    // Create instance of Rect, To Avoid object allocations during draw/layout operations
+    private val textRect = Rect()
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val cornerRadius = 10.0F
-        val backgroundWidth = measuredWidth.toFloat()
-        val backgroundHeight = measuredHeight.toFloat()
 
+        // Get Width and Height
+        val width = measuredWidth.toFloat()
+        val height = measuredHeight.toFloat()
+
+
+        // Set dial background color to green if selection not off.
         canvas.drawColor(buttonBackgroundColor)
+
+        // Paint Text
         textPaint.getTextBounds(buttonText, 0, buttonText.length, textRect)
+
+        // Center X
+        val centerX = width / 2
+
+        // Get afterPaint textPaint Center Y
+        val centerY = height / 2 - textRect.centerY()
+
+        // Background Paint, Draw Round Rect
         canvas.drawRoundRect(
             0F,
             0F,
-            backgroundWidth,
-            backgroundHeight,
-            cornerRadius,
-            cornerRadius,
+            width,
+            height,
+            0F,
+            0F,
             backgroundPaint
         )
 
+        // Show Loading Shape if buttonState == Loading
         if (buttonState == ButtonState.Loading) {
-            var progressVal = progress * measuredWidth.toFloat()
+
+            // Draw Animated Rect Background
             canvas.drawRoundRect(
                 0F,
                 0F,
-                progressVal,
-                backgroundHeight,
-                cornerRadius,
-                cornerRadius,
+                progress * width,
+                height,
+                0F,
+                0F,
                 inProgressBackgroundPaint
             )
 
-            val arcDiameter = cornerRadius * 2
-            val arcRectSize = measuredHeight.toFloat() - paddingBottom.toFloat() - arcDiameter
+            // Arc Padding
+            val padding = 40F
 
-            progressVal = progress * 360F
+            // Arc Size
+            val arcSize = 150F
+
+            // Arc Space From Left
+            val spaceFromLeft = width - textRect.width().toFloat() - padding / 2
+
+            // Draw Arc on Top of Rect Background
             canvas.drawArc(
-                paddingStart.toFloat() + arcDiameter,
-                paddingTop.toFloat() + arcDiameter,
-                arcRectSize,
-                arcRectSize,
+                spaceFromLeft, // LEFT
+                padding, // TOP
+                spaceFromLeft + arcSize, // RIGHT
+                height - padding, // BOTTOM
                 0F,
-                progressVal,
+                progress * 360F,
                 true,
                 inProgressArcPaint
             )
         }
-        val centerX = measuredWidth.toFloat() / 2
-        val centerY = measuredHeight.toFloat() / 2 - textRect.centerY()
 
+        // Draw Button Text on Top of all canvas
         canvas.drawText(buttonText, centerX, centerY, textPaint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        // Min Width
         val minWidth: Int = paddingLeft + paddingRight + suggestedMinimumWidth
-        val width: Int = resolveSizeAndState(minWidth, widthMeasureSpec, 1)
+
+        // Width
+        val width: Int = resolveSizeAndState(
+            minWidth,
+            widthMeasureSpec,
+            1
+        )
+
+        // Height
         val height: Int = resolveSizeAndState(
             MeasureSpec.getSize(width),
             heightMeasureSpec,
             0
         )
-        widthSize = width
-        heightSize = height
+
+        // Set Measured Dimension
         setMeasuredDimension(width, height)
-    }
-
-    private fun disableLoadingButton() {
-        this.isEnabled = false
-    }
-
-    private fun enableLoadingButton() {
-        this.isEnabled = true
-    }
-
-    fun setLoadingButtonState(state: ButtonState) {
-        buttonState = state
     }
 
     private fun setText(buttonText: String) {
         this.buttonText = buttonText
+        // Call reDraw
+        reDraw()
+    }
+
+    private fun setBackgroundColorFromRecourse(color: Int) {
+        buttonBackgroundColor = color
+
+        // Call reDraw
+        reDraw()
+    }
+
+    private fun reDraw() {
+        // Forcing a call to onDraw() to redraw the view.
         invalidate()
-        requestLayout()
     }
 
-    private fun setBackgroundColorFromRes(id: Int) {
-        buttonBackgroundColor = getColor(id)
-        invalidate()
-        requestLayout()
-    }
-
-    private fun resetProgress() {
-        progress = 0f
-    }
-
-    private fun getColor(id: Int): Int {
-        return ContextCompat.getColor(context, id)
+    fun setState(pState: ButtonState) {
+        this.buttonState = pState
     }
 
     private fun ValueAnimator.disableViewDuringAnimation() {
         // This extension method listens for start/end events on an animation and disables
-        // the given view for the entirety of that animation.
+        // The given view for the entirety of that animation.
         addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationStart(animation: Animator) {
+                // Set enabled to false, To avoid pressing the button while animating
                 isEnabled = false
             }
 
             override fun onAnimationEnd(animation: Animator) {
+                // Set enabled to true, So the user can click again
+                // On the button when state is Completed
                 isEnabled = true
             }
         })

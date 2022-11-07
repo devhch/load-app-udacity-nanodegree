@@ -11,10 +11,8 @@ import android.content.IntentFilter
 import android.database.Cursor
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
+import android.os.*
 import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.os.Environment
 import android.widget.RadioButton
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
@@ -23,6 +21,8 @@ import androidx.databinding.DataBindingUtil
 import com.devhch.loadapp.databinding.ActivityMainBinding
 import com.devhch.loadapp.utils.Constants
 import com.devhch.loadapp.utils.sendNotification
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
         // Download Button OnClickListener
         loadingButton = binding.included.downloadButton
-        loadingButton.setLoadingButtonState(ButtonState.Completed)
+        loadingButton.setState(ButtonState.Completed)
         loadingButton.setOnClickListener { download() }
 
         // Glide Radio Button OnClickListener
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                             val columnIndex = if (cursorColumnIndex >= 0) cursorColumnIndex else 0
                             val status = cursor.getInt(columnIndex)
                             if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                                loadingButton.setLoadingButtonState(ButtonState.Completed)
+                                loadingButton.setState(ButtonState.Completed)
                                 notificationManager.sendNotification(
                                     applicationContext,
                                     checkedGitHubFileName.toString(),
@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
                                     context.getString(R.string.downloaded_successfully)
                                 )
                             } else {
-                                loadingButton.setLoadingButtonState(ButtonState.Completed)
+                                loadingButton.setState(ButtonState.Completed)
                                 notificationManager.sendNotification(
                                     applicationContext,
                                     checkedGitHubFileName.toString(),
@@ -130,69 +130,79 @@ class MainActivity : AppCompatActivity() {
 
     private fun download() {
         // Set ButtonState to Clicked
-        loadingButton.setLoadingButtonState(ButtonState.Clicked)
+        loadingButton.setState(ButtonState.Clicked)
 
-        if (checkedGitHubRepository != null) {
-            // Set ButtonState to Loading
-            loadingButton.setLoadingButtonState(ButtonState.Loading)
+        // Wait 200 Millis to show Orange Background Color.
+        Handler(Looper.getMainLooper()).postDelayed(
+            {
+                if (checkedGitHubRepository != null) {
+                    // Set ButtonState to Loading
+                    loadingButton.setState(ButtonState.Loading)
 
-            // Initialize notificationManager
-            notificationManager = ContextCompat.getSystemService(
-                applicationContext,
-                NotificationManager::class.java
-            ) as NotificationManager
+                    // Initialize notificationManager
+                    notificationManager = ContextCompat.getSystemService(
+                        applicationContext,
+                        NotificationManager::class.java
+                    ) as NotificationManager
 
 
-            // createChannel
-            createChannel(
-                getString(R.string.notification_channel_id),
-                getString(R.string.notification_channel_name)
-            )
+                    // createChannel
+                    createChannel(
+                        getString(R.string.notification_channel_id),
+                        getString(R.string.notification_channel_name)
+                    )
 
-            val file = File(getExternalFilesDir(null), "/${Constants.KEY_GITHUB_REPOSITORIES}")
-            if (!file.exists()) {
-                file.mkdirs()
-            }
+                    val file =
+                        File(getExternalFilesDir(null), "/${Constants.KEY_GITHUB_REPOSITORIES}")
+                    if (!file.exists()) {
+                        file.mkdirs()
+                    }
 
-            // Path
-            val splitName = checkedGitHubFileName?.split(' ')?.get(0)
-            val path = "/${Constants.KEY_GITHUB_REPOSITORIES}/${splitName}.zip"
+                    // Path
+                    val splitName = checkedGitHubFileName?.split(' ')?.get(0)
+                    val path = "/${Constants.KEY_GITHUB_REPOSITORIES}/${splitName}.zip"
 
-            /// Request download
-            val request =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    DownloadManager.Request(Uri.parse(checkedGitHubRepository))
-                        .setTitle(getString(R.string.app_name))
-                        .setDescription(getString(R.string.app_description))
-                        .setRequiresCharging(false)
-                        .setAllowedOverMetered(true)
-                        .setAllowedOverRoaming(true)
-                        .setDestinationInExternalPublicDir(
-                            Environment.DIRECTORY_DOWNLOADS,
-                            path
-                        )
+                    /// Request download
+                    val request =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            DownloadManager.Request(Uri.parse(checkedGitHubRepository))
+                                .setTitle(getString(R.string.app_name))
+                                .setDescription(getString(R.string.app_description))
+                                .setRequiresCharging(false)
+                                .setAllowedOverMetered(true)
+                                .setAllowedOverRoaming(true)
+                                .setDestinationInExternalPublicDir(
+                                    Environment.DIRECTORY_DOWNLOADS,
+                                    path
+                                )
+                        } else {
+                            DownloadManager.Request(Uri.parse(checkedGitHubRepository))
+                                .setTitle(getString(R.string.app_name))
+                                .setDescription(getString(R.string.app_description))
+                                .setAllowedOverMetered(true)
+                                .setAllowedOverRoaming(true)
+                                .setDestinationInExternalPublicDir(
+                                    Environment.DIRECTORY_DOWNLOADS,
+                                    path
+                                )
+                        }
+
+                    val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+                    // Enqueue puts the download request in the queue.
+                    downloadID = downloadManager.enqueue(request)
                 } else {
-                    DownloadManager.Request(Uri.parse(checkedGitHubRepository))
-                        .setTitle(getString(R.string.app_name))
-                        .setDescription(getString(R.string.app_description))
-                        .setAllowedOverMetered(true)
-                        .setAllowedOverRoaming(true)
-                        .setDestinationInExternalPublicDir(
-                            Environment.DIRECTORY_DOWNLOADS,
-                            path
-                        )
+                    // Set ButtonState to Completed
+                    loadingButton.setState(ButtonState.Completed)
+
+                    // Show Toast
+                    Toast.makeText(this, getString(R.string.please_select_file), Toast.LENGTH_SHORT)
+                        .show()
                 }
+            },
+            200
+        )
 
-            val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-            // Enqueue puts the download request in the queue.
-            downloadID = downloadManager.enqueue(request)
-        } else {
-            // Set ButtonState to Completed
-            loadingButton.setLoadingButtonState(ButtonState.Completed)
 
-            // Show Toast
-            Toast.makeText(this, getString(R.string.please_select_file), Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun createChannel(channelId: String, channelName: String) {
@@ -212,11 +222,9 @@ class MainActivity : AppCompatActivity() {
             notificationChannel.description =
                 getString(R.string.notification_channel_description)
 
+            // Notification Manager
             val notificationManager = getSystemService(NotificationManager::class.java)
-
             notificationManager.createNotificationChannel(notificationChannel)
         }
     }
-
-
 }
