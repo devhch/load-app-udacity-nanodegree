@@ -123,7 +123,6 @@ class LoadingButton @JvmOverloads constructor(
             // Get LoadingButton_text String
             getString(R.styleable.LoadingButton_text)?.let { buttonText = it }
             buttonBackgroundColor = getColor(R.styleable.LoadingButton_buttonBackgroundColor, 0)
-
         }
     }
 
@@ -169,8 +168,7 @@ class LoadingButton @JvmOverloads constructor(
         // Get Width and Height
         val width = measuredWidth.toFloat()
         val height = measuredHeight.toFloat()
-
-
+        
         // Set dial background color to green if selection not off.
         canvas.drawColor(buttonBackgroundColor)
 
