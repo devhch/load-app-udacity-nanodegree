@@ -3,10 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-    </data>
-
     <androidx.constraintlayout.motion.widget.MotionLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -26,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/file_name"
+            android:id="@+id/repository_name_text_view"
             style="@style/TitleTextStyle"
             android:layout_width="0dp"
             android:layout_marginStart="@dimen/space40"
@@ -36,7 +32,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/file_name_title"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <TextView
             android:id="@+id/status_title_text_view"
@@ -56,12 +51,9 @@
             android:layout_marginTop="@dimen/space32"
             android:layout_marginEnd="@dimen/space16"
             android:text="@string/status"
-            app:layout_constraintTop_toBottomOf="@id/file_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/status_title_text_view"
- />
-
-
+            app:layout_constraintTop_toBottomOf="@id/file_name" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/ok_button"
