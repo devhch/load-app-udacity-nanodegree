@@ -17,14 +17,15 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
         // Get Intent Extras
-        binding.included.fileName.text = intent.getStringExtra(Constants.KEY_REPOSITORY_NAME).toString()
-        binding.included.statusTextView.text = intent.getStringExtra(Constants.KEY_STATUS).toString()
+        binding.included.fileName.text =
+            intent.getStringExtra(Constants.KEY_REPOSITORY_NAME).toString()
+        binding.included.statusTextView.text =
+            intent.getStringExtra(Constants.KEY_STATUS).toString()
 
         // Ok Button On Click Listener
         binding.included.okButton.setOnClickListener {
             // Go to main activity
-            val mainActivity = Intent(this, MainActivity::class.java)
-            startActivity(mainActivity)
+            startActivity(Intent(this, MainActivity::class.java))
         }
     }
 }
