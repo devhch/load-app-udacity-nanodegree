@@ -3,6 +3,7 @@ package com.devhch.loadapp
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.devhch.loadapp.databinding.ActivityDetailBinding
 import com.devhch.loadapp.utils.Constants
@@ -20,10 +21,21 @@ class DetailActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
         // Get Intent Extras
-        binding.included.repositoryNameTextView.text =
-            intent.getStringExtra(Constants.KEY_REPOSITORY_NAME)
-        binding.included.statusTextView.text =
-            intent.getStringExtra(Constants.KEY_STATUS)
+        val repository = intent.getStringExtra(Constants.KEY_REPOSITORY_NAME)
+        val status = intent.getStringExtra(Constants.KEY_STATUS)
+
+        // Set Values
+        binding.included.repositoryNameTextView.text = repository
+        binding.included.statusTextView.text = status
+
+        // Generate Text Color Depends on Status
+        val color = if (status!!.contains("success")) R.color.colorPrimary else R.color.colorAccent
+        binding.included.statusTextView.setTextColor(
+            ContextCompat.getColor(
+                applicationContext,
+                color
+            )
+        )
 
         // Ok Button On Click Listener
         binding.included.okButton.setOnClickListener {
